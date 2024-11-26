@@ -5,7 +5,7 @@ import { Gameover } from './scenes/gameover.js';
 const config = {
     type: Phaser.AUTO,
     width: 800,
-    height: 500,
+    height: 600,
     parent: 'game-container',
     scale: {
         mode: Phaser.Scale.FIT,

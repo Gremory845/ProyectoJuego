@@ -10,6 +10,9 @@ export class Game extends Phaser.Scene {
     init() {
         this.phaseConstructor = new PhaseConstructor(this);
         this.score = 0;
+        this.timer = null;
+        this.length = 0;
+        this.hasFetched = false;
         this.liveCounter = new LiveCounter(this, 4);
     }
 
@@ -31,19 +34,6 @@ export class Game extends Phaser.Scene {
 
         this.liveCounter.create();
 
-        /*this.bricks = this.physics.add.staticGroup({
-            key: ['bluebrick', 'orangebrick', 'greenbrick', 'blackbrick'],
-            frameQuantity: 10,
-            gridAlign: {
-                width: 10,
-                height: 4,
-                cellWidth: 66,
-                cellHeight: 34,
-                x: 75,
-                y: 105
-            }
-        });*/
-
         this.platform = this.physics.add.image(400, 460, 'platform').setImmovable();
         this.platform.body.allowGravity = false;
         this.platform.setCollideWorldBounds(true);
@@ -57,14 +47,18 @@ export class Game extends Phaser.Scene {
 
         this.physics.add.collider(this.ball, this.platform, this.platformImpact, null, this);
 
-        //this.physics.add.collider(this.ball, this.bricks, this.brickImpact, null, this);
-
         this.phaseConstructor.create();
 
         this.scoreText = this.add.text(16, 16, 'PUNTOS: 0', { fontSize: '20px', fill: '#fff', fontFamily: 'verdana, arial, sans-serif' });
     }
 
     update() {
+      this.timer = this.time.addEvent({
+        delay: 1000,
+        loop: true,
+        callbackScope: this,
+        callback: this.startTracking
+      });
         if (this.cursors.left.isDown) {
           this.platform.setVelocityX(-500);
           if(this.ball.getData('glue')) {
@@ -127,23 +121,47 @@ export class Game extends Phaser.Scene {
 
     endGame(completed = false) {
         if (!completed) {
-          this.sendScore();
+          if(!this.hasFetched){
+            this.hasFetched = true;
+            this.sendScore("No");
+          }
             this.scene.start('gameover');
         } else {
-          this.sendScore();
+          if(!this.hasFetched){
+            this.hasFetched = true;
+            this.sendScore("No");
+          }
             this.scene.start('congratulations');
         }
     }
-    //http://localhost/proyecto2/php/save_score.php
-    sendScore() {
-      fetch('../php/save_score.php', {
+    
+    startTracking() {
+        this.length += 1;
+        console.log("El juego se ha ejecutado por: ", this.length, "segundos.");
+    }
+    sendScore(hasClosed) {
+      console.log("El puntaje antes de enviar es de :", this.score);//se añade un breakpoint para verificar si la variable this.score recibe un valor antes de enviarlo al servidor
+      fetch('http://localhost/proyecto2/php/save_score.php', {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ score: this.score })
+          body: JSON.stringify({ 
+            "score": this.score,
+            "length": this.length,
+            "level": this.phaseConstructor.getCurrentLevel(),
+            "browser": navigator.userAgent,
+            "screen": screen.width + "x" + screen.height,
+            "closed": hasClosed
+          }),
+          keepalive: true
       })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
       .then(data => {
           if (data.success) {
               console.log("Puntaje guardado exitosamente en la base de datos.");
@@ -162,3 +180,7 @@ export class Game extends Phaser.Scene {
         this.ball.setData('glue', true);
       }
 }
+window.addEventListener('beforeunload', (event) => {
+  console.log('Se cerró de manera abrupta.');
+  sendScore("Yes");
+})//agregado

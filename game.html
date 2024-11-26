@@ -1,40 +1,47 @@
-<!doctype html>
+<!DOCTYPE html>
 <html class="no-js" lang="en">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PaintBall</title>
+    <title>PaintBall Game</title>
     <link rel="stylesheet" href="./css/styles.css">
-    <meta name="description" content="">
+    <meta name="description" content="Un emocionante juego de PaintBall. ¡Destruye bloques y consigue la mayor puntuación!">
 
-    <meta property="og:title" content="">
-    <meta property="og:type" content="">
+    <meta property="og:title" content="PaintBall Game">
+    <meta property="og:type" content="website">
     <meta property="og:url" content="">
     <meta property="og:image" content="">
-    <meta property="og:image:alt" content="">
+    <meta property="og:image:alt" content="PaintBall Game Logo">
 
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icon.png">
 
     <link rel="manifest" href="site.webmanifest">
-    <meta name="theme-color" content="#fafafa">
+    <meta name="theme-color" content="#1e1e1e">
     <script src="https://cdn.jsdelivr.net/npm/phaser@v3.85.2/dist/phaser.js"></script>
 </head>
 
-<body>
-
-    <header>
-        <h1>Bienvenido a PaintBall Game</h1>
-        <p>Destuye los bloques y has la mayor puntuación que puedas</p>
+<body class="body-game">
+    <header class="header-game">
+        <div class="logo">
+            <h1>🎯 PaintBall Game</h1>
+        </div>
+        <p class="tagline">Destruye los bloques y consigue la mejor puntuación</p>
     </header>
 
-    <main>
-        <div id="game-container"></div>
-        </div>
-        
+    <main class="main-game">
+        <div class="game-container" id="game-container"></div>
+        <form action="./php/logout.php" method="POST">
+            <input type="hidden" name="logout" value="true">
+            <button class="log-button" type="submit">Cerrar Sesión</button>
+        </form>        
     </main>
+
+    <footer class="footer-game">
+        <p>&copy; 2024 PaintBall Game. Todos los derechos reservados.</p>
+    </footer>
 
     <script src="./js/vendor/phaser.js"></script>
     <script src="index.js" type="module"></script>
